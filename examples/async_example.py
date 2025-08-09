@@ -20,19 +20,16 @@ async def async_example():
             if is_online:
                 status = await client.get_server_status(server_address)
                 
-                print(f"IP: {status.get('ip', 'N/A')}")
-                print(f"Port: {status.get('port', 'N/A')}")
+                print(f"IP: {status.ip or 'N/A'}")
+                print(f"Port: {status.port or 'N/A'}")
                 
-                online_players, max_players = await client.get_player_count(server_address)
-                print(f"Players online: {online_players}/{max_players}")
+                print(f"Players online: {status.players.online}/{status.players.max}")
                 
-                version = await client.get_server_version(server_address)
-                if version:
-                    print(f"Version: {version}")
+                if status.version.name:
+                    print(f"Version: {status.version.name}")
                 
-                motd = await client.get_server_motd(server_address)
-                if motd:
-                    print(f"MOTD: {motd}")
+                if status.motd.text:
+                    print(f"MOTD: {status.motd.text}")
         
         except ServerNotFoundError as e:
             print(f"Error: {e}")
@@ -64,8 +61,8 @@ async def check_single_server(client, server):
     """Check a single server."""
     try:
         if await client.is_server_online(server):
-            online, max_players = await client.get_player_count(server)
-            print(f"{server}: {online}/{max_players} players")
+            status = await client.get_server_status(server)
+            print(f"{server}: {status.players.online}/{status.players.max} players")
         else:
             print(f"{server}: Offline")
     except Exception as e:

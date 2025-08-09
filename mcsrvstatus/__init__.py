@@ -8,8 +8,15 @@ from .exceptions import (
     APIError,
     ConnectionError
 )
+from .models import (
+    ServerStatus,
+    BedrockServerStatus,
+    PlayerInfo,
+    ServerVersion,
+    ServerMotd
+)
 
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 __author__ = "Towux"
 __description__ = "Python library for mcsrvstat.us API"
 
@@ -19,5 +26,10 @@ __all__ = [
     "MCSrvStatError", 
     "ServerNotFoundError",
     "APIError",
-    "ConnectionError"
+    "ConnectionError",
+    "ServerStatus",
+    "BedrockServerStatus",
+    "PlayerInfo",
+    "ServerVersion",
+    "ServerMotd"
 ]

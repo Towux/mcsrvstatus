@@ -1,6 +1,6 @@
 # mcsrvstatus
 
-![supported python versions](https://img.shields.io/pypi/pyversions/mcsrvstatus.svg) [![current PyPI version](https://img.shields.io/pypi/v/mcsrvstatus.svg)](https://pypi.org/project/mcsrvstatus/)
+![supported python versions](https://img.shields.io/pypi/pyversions/mcsrvstatus.svg) [![current PyPI version](https://img.shields.io/pypi/v/mcsrvstatus.svg)](https://pypi.org/project/mcsrvstatus/) ![GitHub Repo stars](https://img.shields.io/github/stars/Towux/mcsrvstatus)
 
 A Python library for interacting with the mcsrvstat.us API to check Minecraft server status.
 
@@ -34,7 +34,7 @@ print(f"Server online: {is_online}")
 
 # Get full server status
 status = client.get_server_status("mc.hypixel.net")
-print(f"Players: {status['players']['online']}/{status['players']['max']}")
+print(f"Players: {status.players.online}/{status.players.max}")
 
 client.close()
 ```
@@ -51,7 +51,7 @@ async def main():
         print(f"Server online: {is_online}")
         
         status = await client.get_server_status("mc.hypixel.net")
-        print(f"Players: {status['players']['online']}/{status['players']['max']}")
+        print(f"Players: {status.players.online}/{status.players.max}")
 
 asyncio.run(main())
 ```
@@ -68,16 +68,12 @@ Get full server status information.
 
 ```python
 status = client.get_server_status("play.example.com")
-print(status)
-# {
-#   "online": True,
-#   "ip": "192.168.1.1",
-#   "port": 25565,
-#   "players": {"online": 50, "max": 100, "list": ["player1", "player2"]},
-#   "version": "1.20.1",
-#   "motd": {"clean": ["Welcome to our server!"]},
-#   "icon": "data:image/png;base64,..."
-# }
+print(f"Online: {status.online}")
+print(f"IP: {status.ip}:{status.port}")
+print(f"Players: {status.players.online}/{status.players.max}")
+print(f"Version: {status.version.name}")
+print(f"MOTD: {status.motd.text}")
+print(f"Player list: {status.players.list}")
 ```
 
 **`get_bedrock_status(server_address: str, version: int = 3) -> Dict[str, Any]`**
@@ -180,13 +176,10 @@ try:
     print(f"Checking {server}...")
     
     if client.is_server_online(server):
-        online, max_players = client.get_player_count(server)
-        version = client.get_server_version(server)
-        motd = client.get_server_motd(server)
-        
-        print(f"✓ Online: {online}/{max_players} players")
-        print(f"✓ Version: {version}")
-        print(f"✓ MOTD: {motd}")
+        status = client.get_server_status(server)
+        print(f"✓ Online: {status.players.online}/{status.players.max} players")
+        print(f"✓ Version: {status.version.name}")
+        print(f"✓ MOTD: {status.motd.text}")
     else:
         print("✗ Server is offline")
 
@@ -218,8 +211,8 @@ async def check_servers():
 async def check_single_server(client, server):
     try:
         if await client.is_server_online(server):
-            online, max_players = await client.get_player_count(server)
-            print(f"{server}: {online}/{max_players} players")
+            status = await client.get_server_status(server)
+            print(f"{server}: {status.players.online}/{status.players.max} players")
         else:
             print(f"{server}: Offline")
     except Exception as e:
@@ -237,8 +230,8 @@ client = MinecraftServerStatus()
 
 try:
     status = client.get_bedrock_status("play.nethergames.org")
-    print(f"Bedrock server online: {status['online']}")
-    print(f"Players: {status['players']['online']}/{status['players']['max']}")
+    print(f"Bedrock server online: {status.online}")
+    print(f"Players: {status.players.online}/{status.players.max}")
 except Exception as e:
     print(f"Error: {e}")
 finally:
@@ -253,7 +246,7 @@ from mcsrvstatus import MinecraftServerStatus
 # Automatically handles connection cleanup
 with MinecraftServerStatus() as client:
     status = client.get_server_status("play.example.com")
-    print(f"Server: {status['ip']}:{status['port']}")
+    print(f"Server: {status.ip}:{status.port}")
 ```
 
 ## API Versions
@@ -274,19 +267,3 @@ status = client.get_server_status("play.example.com", version=2)
 ## License
 
 MIT License - see LICENSE file for details.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Run tests: `python -m pytest`
-5. Submit a pull request
-
-## Changelog
-
-### 1.0.0
-- Initial release
-- Sync and async support
-- Complete API coverage
-- Comprehensive error handling

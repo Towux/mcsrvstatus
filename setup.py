@@ -11,7 +11,7 @@ if os.path.exists("README.md"):
 
 setup(
     name="mcsrvstatus",
-    version="1.0.3",
+    version="1.0.4",
     author="Towux",
     author_email="",
     description="Python library for mcsrvstat.us API - Minecraft server status checker",

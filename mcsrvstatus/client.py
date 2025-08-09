@@ -3,6 +3,7 @@
 import requests
 from typing import Dict, Any, Optional, Tuple
 from .exceptions import ServerNotFoundError, APIError, ConnectionError
+from .models import ServerStatus, BedrockServerStatus
 
 
 class MinecraftServerStatus:
@@ -29,7 +30,7 @@ class MinecraftServerStatus:
         except ValueError as e:
             raise APIError(f"API response parsing error: {e}")
     
-    def get_server_status(self, server_address: str, version: int = 3) -> Dict[str, Any]:
+    def get_server_status(self, server_address: str, version: int = 3) -> ServerStatus:
         if version not in [1, 2, 3]:
             raise ValueError("API version must be 1, 2, or 3")
         
@@ -39,9 +40,9 @@ class MinecraftServerStatus:
         if not data.get('online', False):
             raise ServerNotFoundError(f"Server {server_address} is offline or not found")
         
-        return data
+        return ServerStatus.from_dict(data)
     
-    def get_bedrock_status(self, server_address: str, version: int = 3) -> Dict[str, Any]:
+    def get_bedrock_status(self, server_address: str, version: int = 3) -> BedrockServerStatus:
         if version not in [1, 2, 3]:
             raise ValueError("API version must be 1, 2, or 3")
         
@@ -51,49 +52,44 @@ class MinecraftServerStatus:
         if not data.get('online', False):
             raise ServerNotFoundError(f"Bedrock server {server_address} is offline or not found")
         
-        return data
+        return BedrockServerStatus.from_dict(data)
     
     def get_server_icon(self, server_address: str) -> Optional[str]:
         try:
-            data = self.get_server_status(server_address)
-            return data.get('icon')
+            status = self.get_server_status(server_address)
+            return status.icon
         except (ServerNotFoundError, APIError):
             return None
     
     def is_server_online(self, server_address: str) -> bool:
         try:
-            data = self.get_server_status(server_address)
-            return data.get('online', False)
+            status = self.get_server_status(server_address)
+            return status.online
         except (ServerNotFoundError, APIError, ConnectionError):
             return False
     
     def get_player_count(self, server_address: str) -> Tuple[int, int]:
-        data = self.get_server_status(server_address)
-        players = data.get('players', {})
-        return players.get('online', 0), players.get('max', 0)
+        status = self.get_server_status(server_address)
+        return status.player_count
     
     def get_server_version(self, server_address: str) -> Optional[str]:
         try:
-            data = self.get_server_status(server_address)
-            return data.get('version')
+            status = self.get_server_status(server_address)
+            return status.server_version
         except (ServerNotFoundError, APIError):
             return None
     
     def get_server_motd(self, server_address: str) -> Optional[str]:
         try:
-            data = self.get_server_status(server_address)
-            motd = data.get('motd', {})
-            if isinstance(motd, dict):
-                return motd.get('clean', [''])[0] if motd.get('clean') else None
-            return str(motd) if motd else None
+            status = self.get_server_status(server_address)
+            return status.server_motd
         except (ServerNotFoundError, APIError):
             return None
     
     def get_player_list(self, server_address: str) -> list:
         try:
-            data = self.get_server_status(server_address)
-            players = data.get('players', {})
-            return players.get('list', [])
+            status = self.get_server_status(server_address)
+            return status.player_list
         except (ServerNotFoundError, APIError):
             return []
     

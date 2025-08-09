@@ -21,31 +21,29 @@ def sync_example():
                 # Get full server information
                 status = client.get_server_status(server_address)
                 
-                print(f"IP: {status.get('ip', 'N/A')}")
-                print(f"Port: {status.get('port', 'N/A')}")
+                print(f"IP: {status.ip or 'N/A'}")
+                print(f"Port: {status.port or 'N/A'}")
                 
                 # Player information
-                online_players, max_players = client.get_player_count(server_address)
-                print(f"Players online: {online_players}/{max_players}")
+                print(f"Players online: {status.players.online}/{status.players.max}")
                 
                 # Server version
-                version = client.get_server_version(server_address)
-                if version:
-                    print(f"Version: {version}")
+                if status.version.name:
+                    print(f"Version: {status.version.name}")
                 
                 # Server MOTD
-                motd = client.get_server_motd(server_address)
-                if motd:
-                    print(f"MOTD: {motd}")
+                if status.motd.text:
+                    print(f"MOTD: {status.motd.text}")
                 
                 # Player list (if available)
-                players = client.get_player_list(server_address)
-                if players:
-                    print(f"Players: {', '.join(players[:5])}{'...' if len(players) > 5 else ''}")
+                if status.players.list:
+                    players_text = ', '.join(status.players.list[:5])
+                    if len(status.players.list) > 5:
+                        players_text += "..."
+                    print(f"Players: {players_text}")
                 
                 # Check for server icon
-                icon = client.get_server_icon(server_address)
-                if icon:
+                if status.icon:
                     print("Server icon: Available")
         
         except ServerNotFoundError as e:
@@ -68,8 +66,8 @@ def bedrock_example():
             status = client.get_bedrock_status(bedrock_server)
             
             print(f"Bedrock server: {bedrock_server}")
-            print(f"Online: {status.get('online', False)}")
-            print(f"Players: {status.get('players', {}).get('online', 0)}/{status.get('players', {}).get('max', 0)}")
+            print(f"Online: {status.online}")
+            print(f"Players: {status.players.online}/{status.players.max}")
             
         except ServerNotFoundError:
             print("Bedrock server is offline")

@@ -4,6 +4,7 @@ import aiohttp
 import asyncio
 from typing import Dict, Any, Optional, Tuple
 from .exceptions import ServerNotFoundError, APIError, ConnectionError
+from .models import ServerStatus, BedrockServerStatus
 
 
 class AsyncMinecraftServerStatus:
@@ -35,7 +36,7 @@ class AsyncMinecraftServerStatus:
         except ValueError as e:
             raise APIError(f"API response parsing error: {e}")
     
-    async def get_server_status(self, server_address: str, version: int = 3) -> Dict[str, Any]:
+    async def get_server_status(self, server_address: str, version: int = 3) -> ServerStatus:
         if version not in [1, 2, 3]:
             raise ValueError("API version must be 1, 2, or 3")
         
@@ -45,9 +46,9 @@ class AsyncMinecraftServerStatus:
         if not data.get('online', False):
             raise ServerNotFoundError(f"Server {server_address} is offline or not found")
         
-        return data
+        return ServerStatus.from_dict(data)
     
-    async def get_bedrock_status(self, server_address: str, version: int = 3) -> Dict[str, Any]:
+    async def get_bedrock_status(self, server_address: str, version: int = 3) -> BedrockServerStatus:
         if version not in [1, 2, 3]:
             raise ValueError("API version must be 1, 2, or 3")
         
@@ -57,49 +58,44 @@ class AsyncMinecraftServerStatus:
         if not data.get('online', False):
             raise ServerNotFoundError(f"Bedrock server {server_address} is offline or not found")
         
-        return data
+        return BedrockServerStatus.from_dict(data)
     
     async def get_server_icon(self, server_address: str) -> Optional[str]:
         try:
-            data = await self.get_server_status(server_address)
-            return data.get('icon')
+            status = await self.get_server_status(server_address)
+            return status.icon
         except (ServerNotFoundError, APIError):
             return None
     
     async def is_server_online(self, server_address: str) -> bool:
         try:
-            data = await self.get_server_status(server_address)
-            return data.get('online', False)
+            status = await self.get_server_status(server_address)
+            return status.online
         except (ServerNotFoundError, APIError, ConnectionError):
             return False
     
     async def get_player_count(self, server_address: str) -> Tuple[int, int]:
-        data = await self.get_server_status(server_address)
-        players = data.get('players', {})
-        return players.get('online', 0), players.get('max', 0)
+        status = await self.get_server_status(server_address)
+        return status.player_count
     
     async def get_server_version(self, server_address: str) -> Optional[str]:
         try:
-            data = await self.get_server_status(server_address)
-            return data.get('version')
+            status = await self.get_server_status(server_address)
+            return status.server_version
         except (ServerNotFoundError, APIError):
             return None
     
     async def get_server_motd(self, server_address: str) -> Optional[str]:
         try:
-            data = await self.get_server_status(server_address)
-            motd = data.get('motd', {})
-            if isinstance(motd, dict):
-                return motd.get('clean', [''])[0] if motd.get('clean') else None
-            return str(motd) if motd else None
+            status = await self.get_server_status(server_address)
+            return status.server_motd
         except (ServerNotFoundError, APIError):
             return None
     
     async def get_player_list(self, server_address: str) -> list:
         try:
-            data = await self.get_server_status(server_address)
-            players = data.get('players', {})
-            return players.get('list', [])
+            status = await self.get_server_status(server_address)
+            return status.player_list
         except (ServerNotFoundError, APIError):
             return []
     
