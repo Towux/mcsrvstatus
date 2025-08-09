@@ -1,6 +1,6 @@
 # mcsrvstatus
 
-![supported python versions](https://img.shields.io/pypi/pyversions/mcsrvstatus.svg) [![current PyPI version](https://img.shields.io/pypi/v/mcsrvstatus.svg)](https://pypi.org/project/mcstatus/)
+![supported python versions](https://img.shields.io/pypi/pyversions/mcsrvstatus.svg) [![current PyPI version](https://img.shields.io/pypi/v/mcsrvstatus.svg)](https://pypi.org/project/mcsrvstatus/)
 
 A Python library for interacting with the mcsrvstat.us API to check Minecraft server status.
 

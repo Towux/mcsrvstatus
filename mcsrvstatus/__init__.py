@@ -9,7 +9,7 @@ from .exceptions import (
     ConnectionError
 )
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 __author__ = "Towux"
 __description__ = "Python library for mcsrvstat.us API"
 
