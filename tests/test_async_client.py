@@ -36,9 +36,9 @@ class TestAsyncMinecraftServerStatus(unittest.TestCase):
         
         async def test():
             result = await self.client.get_server_status('test.server.com')
-            self.assertTrue(result['online'])
-            self.assertEqual(result['players']['online'], 5)
-            self.assertEqual(result['version'], '1.19.4')
+            self.assertTrue(result.online)
+            self.assertEqual(result.players.online, 5)
+            self.assertEqual(result.version.name, '1.19.4')
         
         asyncio.run(test())
     
@@ -115,9 +115,9 @@ class TestAsyncMinecraftServerStatus(unittest.TestCase):
         
         async def test():
             result = await self.client.get_bedrock_status('bedrock.server.com')
-            self.assertTrue(result['online'])
-            self.assertEqual(result['port'], 19132)
-            self.assertEqual(result['players']['online'], 10)
+            self.assertTrue(result.online)
+            self.assertEqual(result.port, 19132)
+            self.assertEqual(result.players.online, 10)
         
         asyncio.run(test())
     

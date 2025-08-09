@@ -16,7 +16,7 @@ from .models import (
     ServerMotd
 )
 
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 __author__ = "Towux"
 __description__ = "Python library for mcsrvstat.us API"
 
