@@ -9,8 +9,8 @@ from .exceptions import (
     ConnectionError
 )
 
-__version__ = "1.0.1"
-__author__ = "mcsrvstatus"
+__version__ = "1.0.2"
+__author__ = "Towux"
 __description__ = "Python library for mcsrvstat.us API"
 
 __all__ = [
